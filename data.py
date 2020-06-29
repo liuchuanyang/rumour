@@ -11,15 +11,18 @@ def read_data(files):
     data=[]
     df=pd.read_csv(files)
     # print(pd.head())
+    # 分词
+    lac=LAC(mode="seg")
     stop_words_list=stop_words()
     start_time=datetime.datetime.now()
     for _, row in df.iterrows():
         # print(index, row)
         # 分词
-        text_list=seg_word(row["text"])
-        # print(text_list)
+        # text_list=seg_word(row["text"])
+        text_list=lac.run(row["text"])
+        # # print(text_list)
         tmp=[]
-        # 去停用词
+        # # 去停用词
         for word in text_list:
             if word not in stop_words_list:
                 # print(word)
@@ -27,8 +30,9 @@ def read_data(files):
         # text_list=tmp
         label=row["label"]
         data.append([tmp, label])
+        pass
     endtime=datetime.datetime.now()
-    print((endtime-start_time).minute)
+    print((endtime-start_time).seconds)
     return data
 # 读取停用词
 def stop_words():

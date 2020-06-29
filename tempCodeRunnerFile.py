@@ -1,0 +1,1 @@
+ text_list=seg_word(row["text"])
