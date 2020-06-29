@@ -12,6 +12,7 @@ def read_data(files):
     df=pd.read_csv(files)
     print(pd.head())
     stop_words_list=stop_words()
+    start_time=datetime.datetime.now()
     for _, row in df.iterrows():
         # print(index, row)
         # 分词
@@ -26,6 +27,8 @@ def read_data(files):
         # text_list=tmp
         label=row["label"]
         data.append([tmp, label])
+    endtime=datetime.datetime.now()
+    print((endtime-start_time).minute)
     return data
 # 读取停用词
 def stop_words():
@@ -49,8 +52,8 @@ def test(files):
     print((endtime-start_time).minute)
     # print(df["seg"])
 if __name__=="__main__":
-    # data=read_data("./data/train.csv")
+    data=read_data("./data/train.csv")
     # print(data[0:2])
     # print(seg_word("我是中国人"))
     # stop_words_list()
-    test("./data/train.csv")
+    # test("./data/train.csv")
