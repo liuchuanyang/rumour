@@ -10,7 +10,7 @@ def flush():
 def read_data(files):
     data=[]
     df=pd.read_csv(files)
-    print(pd.head())
+    # print(pd.head())
     stop_words_list=stop_words()
     start_time=datetime.datetime.now()
     for _, row in df.iterrows():
