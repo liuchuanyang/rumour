@@ -63,6 +63,7 @@ def test(files):
     # print(df["seg"])
 if __name__=="__main__":
     data=read_data("./data/train.csv")
+    print(data[0:3])
     # print(data[0:2])
     # print(seg_word("我是中国人"))
     # stop_words_list()
