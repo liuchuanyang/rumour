@@ -5,6 +5,7 @@ from LAC import LAC
 import sys
 from tqdm import tqdm
 import datetime
+# import jieba
 def flush():
     sys.stdout.flush()
 def read_data(files):
@@ -15,11 +16,15 @@ def read_data(files):
     lac=LAC(mode="seg")
     stop_words_list=stop_words()
     start_time=datetime.datetime.now()
+    count=0
     for _, row in df.iterrows():
         # print(index, row)
         # 分词
         # text_list=seg_word(row["text"])
+        start_time=datetime.datetime.now()
         text_list=lac.run(row["text"])
+       
+        # text_list=jieba.cut(row["text"])
         # # print(text_list)
         tmp=[]
         # # 去停用词
@@ -30,9 +35,10 @@ def read_data(files):
         # text_list=tmp
         label=row["label"]
         data.append([tmp, label])
-        pass
-    endtime=datetime.datetime.now()
-    print((endtime-start_time).seconds)
+        endtime=datetime.datetime.now()
+        print((endtime-start_time).seconds)
+        count+=1
+        print("count=",count,(endtime-start_time).seconds)
     return data
 # 读取停用词
 def stop_words():
@@ -53,7 +59,7 @@ def test(files):
     start_time=datetime.datetime.now()
     df["seg"]=df["text"].apply(lambda x:seg_word(x))
     endtime=datetime.datetime.now()
-    print((endtime-start_time).minute)
+    print("count=",(endtime-start_time).minute)
     # print(df["seg"])
 if __name__=="__main__":
     data=read_data("./data/train.csv")

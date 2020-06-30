@@ -1,1 +1,1 @@
- text_list=seg_word(row["text"])
+start_time=datetime.datetime.now()
