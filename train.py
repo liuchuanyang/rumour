@@ -1,6 +1,7 @@
 from data import *
 from model import *
 import torch.optim as optim
+import time
 word_to_idx={}
 def encode_samples(tokenized_samples, vocab):
     features = []
@@ -39,8 +40,8 @@ def get_data():
     train_tokenized=[]
     # 分词
     train_tokenized=[words for words, _ in train_data]
-    eval_tokenized=[words for words, _ in train_data]
-    test_tokenized=[words for words, _ in train_data]
+    eval_tokenized=[words for words, _ in eval_data]
+    test_tokenized=[words for words, _ in test_data]
     print(train_tokenized[0:3])
     # 训练集词组
     vocab=set(chain(*train_tokenized))
@@ -56,7 +57,9 @@ def get_data():
     eval_features = torch.tensor(pad_samples(encode_samples(eval_tokenized, vocab)))
     eval_labels = torch.tensor([score for _, score in eval_data])
     test_features = torch.tensor(pad_samples(encode_samples(test_tokenized, vocab)))
+    print(test_features.size())
     test_labels = torch.tensor([score for _, score in test_data])
+    print(test_labels.size())
     # return train_data, eval_data, test_data, train_tokenized, eval_tokenized, vocab, vocab_size, word_to_idx, idx_to_word
     # 返回参数
     return train_data, eval_data, test_data, \
