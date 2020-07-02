@@ -55,29 +55,6 @@ def remove_stop_words():
 #     return lac.run(strings)
 def test(files):
     pass
-def encode_samples(tokenized_samples, vocab):
-    features = []
-    for sample in tokenized_samples:
-        feature = []
-        for token in sample:
-            if token in word_to_idx:
-                feature.append(word_to_idx[token])
-            else:
-                feature.append(0)
-        features.append(feature)
-    return features
-
-def pad_samples(features, maxlen=140, PAD=0):
-    padded_features = []
-    for feature in features:
-        if len(feature) >= maxlen:
-            padded_feature = feature[:maxlen]
-        else:
-            padded_feature = feature
-            while(len(padded_feature) < maxlen):
-                padded_feature.append(PAD)
-        padded_features.append(padded_feature)
-    return padded_features
 
 if __name__=="__main__":
     # 获取数据集
@@ -106,22 +83,22 @@ if __name__=="__main__":
     idx_to_word = {i+1: word for i, word in enumerate(vocab)}
     idx_to_word[0] = '<unk>'
     # 
-    train_features = torch.tensor(pad_samples(encode_samples(train_tokenized, vocab)))
-    train_labels = torch.tensor([score for _, score in train_data])
-    eval_features = torch.tensor(pad_samples(encode_samples(eval_tokenized, vocab)))
-    eval_labels = torch.tensor([score for _, score in eval_data])
-    test_features = torch.tensor(pad_samples(encode_samples(test_tokenized, vocab)))
-    test_labels = torch.tensor([score for _, score in test_data])
+    # train_features = torch.tensor(pad_samples(encode_samples(train_tokenized, vocab)))
+    # train_labels = torch.tensor([score for _, score in train_data])
+    # eval_features = torch.tensor(pad_samples(encode_samples(eval_tokenized, vocab)))
+    # eval_labels = torch.tensor([score for _, score in eval_data])
+    # test_features = torch.tensor(pad_samples(encode_samples(test_tokenized, vocab)))
+    # test_labels = torch.tensor([score for _, score in test_data])
     # 权重
-    weight = torch.zeros(vocab_size+1, 300)
+    # weight = torch.zeros(vocab_size+1, 300)
 
-    for i in range(len(wvmodel.index2word)):
-        try:
-        index = word_to_idx[wvmodel.index2word[i]]
-    except:
-        continue
-    weight[index, :] = torch.from_numpy(wvmodel.get_vector(
-        idx_to_word[word_to_idx[wvmodel.index2word[i]]]))
+    # for i in range(len(wvmodel.index2word)):
+    #     try:
+    #         index = word_to_idx[wvmodel.index2word[i]]
+    #     except:
+    #         continue
+    # weight[index, :] = torch.from_numpy(wvmodel.get_vector(
+    #     idx_to_word[word_to_idx[wvmodel.index2word[i]]]))
 
 
 
