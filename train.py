@@ -82,6 +82,15 @@ if __name__=="__main__":
     labels = 2
     lr = 0.8
     device = torch.device('cuda:0')
+    weight = torch.zeros(vocab_size+1, 300)
+
+    for i in range(len(wvmodel.index2word)):
+        try:
+            index = word_to_idx[wvmodel.index2word[i]]
+        except:
+            continue
+        weight[index, :] = torch.from_numpy(wvmodel.get_vector(
+            idx_to_word[word_to_idx[wvmodel.index2word[i]]]))
     use_gpu = True      
     net = SentimentNet(vocab_size=(vocab_size+1), embed_size=embed_size,
                    num_hiddens=num_hiddens, num_layers=num_layers,
