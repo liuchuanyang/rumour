@@ -7,7 +7,7 @@ from tqdm import tqdm
 import datetime
 from itertools import chain
 import gensim
-improt torch.nn as nn
+import torch.nn as nn
 # import jieba
 def flush():
     sys.stdout.flush()
