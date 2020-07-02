@@ -1,5 +1,6 @@
 from data import *
 from model import *
+import torch.optim as optim
 word_to_idx={}
 def encode_samples(tokenized_samples, vocab):
     features = []
