@@ -1,27 +1,30 @@
-# import torch
+import torch
 import pandas as pd
 # 百度分词
 from LAC import LAC 
 import sys
 from tqdm import tqdm
 import datetime
+from itertools import chain
+import gensim
+improt torch.nn as nn
 # import jieba
 def flush():
     sys.stdout.flush()
 def read_data(files):
     data=[]
-    df=pd.read_csv(files)
+    df=pd.read_csv(files, nrows=50)
     # print(pd.head())
     # 分词
     lac=LAC(mode="seg")
     stop_words_list=stop_words()
+    # 计算花费时间
     start_time=datetime.datetime.now()
-    count=0
     for _, row in df.iterrows():
         # print(index, row)
         # 分词
         # text_list=seg_word(row["text"])
-        start_time=datetime.datetime.now()
+
         text_list=lac.run(row["text"])
        
         # text_list=jieba.cut(row["text"])
@@ -36,9 +39,7 @@ def read_data(files):
         label=row["label"]
         data.append([tmp, label])
         endtime=datetime.datetime.now()
-        print((endtime-start_time).seconds)
-        count+=1
-        print("count=",count,(endtime-start_time).seconds)
+    print((endtime-start_time).seconds)
     return data
 # 读取停用词
 def stop_words():
@@ -49,22 +50,81 @@ def remove_stop_words():
     pass
 
 # 分词
-def seg_word(strings):
-    lac=LAC(mode="seg")
-    return lac.run(strings)
+# def seg_word(strings):
+#     lac=LAC(mode="seg")
+#     return lac.run(strings)
 def test(files):
-    stop_words_list=stop_words()
-    data=[]
-    df=pd.read_csv(files)
-    start_time=datetime.datetime.now()
-    df["seg"]=df["text"].apply(lambda x:seg_word(x))
-    endtime=datetime.datetime.now()
-    print("count=",(endtime-start_time).minute)
-    # print(df["seg"])
+    pass
+def encode_samples(tokenized_samples, vocab):
+    features = []
+    for sample in tokenized_samples:
+        feature = []
+        for token in sample:
+            if token in word_to_idx:
+                feature.append(word_to_idx[token])
+            else:
+                feature.append(0)
+        features.append(feature)
+    return features
+
+def pad_samples(features, maxlen=140, PAD=0):
+    padded_features = []
+    for feature in features:
+        if len(feature) >= maxlen:
+            padded_feature = feature[:maxlen]
+        else:
+            padded_feature = feature
+            while(len(padded_feature) < maxlen):
+                padded_feature.append(PAD)
+        padded_features.append(padded_feature)
+    return padded_features
+
 if __name__=="__main__":
+    # 获取数据集
     data=read_data("./data/train.csv")
-    print(data[0:3])
-    # print(data[0:2])
-    # print(seg_word("我是中国人"))
-    # stop_words_list()
-    # test("./data/train.csv")
+    # train 6 eval 1 test 3
+    length=len(data)
+    tag=int(length/10)
+    print(tag)
+    # 训练集
+    train_data=data[:tag*6]
+    eval_data=data[tag*6:tag*7]
+    test_data=data[tag*7:]
+    train_tokenized=[]
+    # 分词
+    train_tokenized=[words for words, _ in train_data]
+    eval_tokenized=[words for words, _ in train_data]
+    test_tokenized=[words for words, _ in train_data]
+    print(train_tokenized[0:3])
+    # 训练集词组
+    vocab=set(chain(*train_tokenized))
+    vocab_size=len(vocab)
+    # wvmodel = gensim.models.KeyedVectors.load_word2vec_format('GoogleNews-vectors-negative300.bin',
+    #                                                        binary=True, encoding='utf-8')
+    word_to_idx  = {word: i+1 for i, word in enumerate(vocab)}
+    word_to_idx['<unk>'] = 0
+    idx_to_word = {i+1: word for i, word in enumerate(vocab)}
+    idx_to_word[0] = '<unk>'
+    # 
+    train_features = torch.tensor(pad_samples(encode_samples(train_tokenized, vocab)))
+    train_labels = torch.tensor([score for _, score in train_data])
+    eval_features = torch.tensor(pad_samples(encode_samples(eval_tokenized, vocab)))
+    eval_labels = torch.tensor([score for _, score in eval_data])
+    test_features = torch.tensor(pad_samples(encode_samples(test_tokenized, vocab)))
+    test_labels = torch.tensor([score for _, score in test_data])
+    # 权重
+    weight = torch.zeros(vocab_size+1, 300)
+
+    for i in range(len(wvmodel.index2word)):
+        try:
+        index = word_to_idx[wvmodel.index2word[i]]
+    except:
+        continue
+    weight[index, :] = torch.from_numpy(wvmodel.get_vector(
+        idx_to_word[word_to_idx[wvmodel.index2word[i]]]))
+
+
+
+
+
+
