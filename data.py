@@ -14,7 +14,7 @@ def flush():
     sys.stdout.flush()
 def read_data(files):
     data=[]
-    df=pd.read_csv(files, nrows=50)
+    df=pd.read_csv(files, nrows=5)
     # print(pd.head())
     # 分词
     lac=LAC(mode="seg")
@@ -83,17 +83,20 @@ def func(words):
 class process():
     def __init__(self,files):
         self.lac=LAC(mode="seg")
-        self.df=pd.read_csv(files)
+        self.df=pd.read_csv(files, nrows=5)
         self.get_stop_words()
     def getData(self):
+        data=[]
         self.df["seg"]=self.df["text"].apply(self.remove_stop_words)
-        return self.df
+        for _, row in self.df.iterrows():
+            data.append([row["seg"], row["label"]])
+        return data
     def remove_stop_words(self, words):
-        words=self.lac.run(words)
-        for index, word in enumerate(words):
+        words_=self.lac.run(words).copy()
+        for index, word in enumerate(words_):
             if word in self.stop_words_list:
-                del words[index]
-        return words
+                del words_[index]
+        return words_
     def get_stop_words(self):
         self.stop_words_list=open("stop_words.txt", "r+", encoding="utf-8").read().split("\n")
 
@@ -104,9 +107,11 @@ if __name__=="__main__":
     print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
     p=process("./data/train.csv")
     print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
-    df=p.getData()
+    data=p.getData()
     print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
-    print(df)
+    # print(data[1])
+    train_tokenized=[words for words, _ in data]
+    print(train_tokenized[0])
 
     # # 获取数据集
     # data=read_data("./data/train.csv")
